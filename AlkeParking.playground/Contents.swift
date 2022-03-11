@@ -6,7 +6,6 @@ protocol Parkable {
     var type: VehicleType { get }
     
     static func checkOutVehicle(_ plate: String, onSuccess: (Int) -> Void, onError: () -> Void)
-    
 }
 
 enum VehicleType {
@@ -49,23 +48,20 @@ struct Parking {
     mutating func checkInVehicle(_ vehicle: Vehicle, onFinish: (Bool) -> Void) {
         guard vehicles.count < maxVehicles else {
             onFinish(false)
-            print("Numero maximo")
+            print("No more parking spaces left. Sorry!")
             return
         }
         
         if  validatePlate(vehicle.plate) {
-            print("plate existe")
             onFinish(false)
         } else {
-            print("todo bien")
+            self.vehicles.insert(vehicle)
             onFinish(true)
         }
     }
     
     mutating func acumulateEarnings(_ valor: Int) -> Void {
-//        let temp1 = earnings.earnings
         earnings.earnings += valor
-//        let temp2 = earnings.vehicles
         earnings.vehicles += 1
         print("acumulate \(earnings)")
     }
@@ -91,6 +87,10 @@ struct Parking {
         return nil
     }
     
+    mutating func removeVehicle(_ vehicle: Vehicle) {
+        self.vehicles.remove(vehicle)
+    }
+    
 }
 
 // MARK: 2.2 - Vehicle.type is defined like a constant cause the type propertie no change.
@@ -98,7 +98,6 @@ struct Vehicle: Parkable, Hashable {
     let plate: String
     let type: VehicleType
     let checkInTime: Date
-//    var checkOutTime: Date = Date()
     var discountCard: String? = ""
         
     init(plate: String, type: VehicleType, checkInTime: Date, discountCard: String? ) {
@@ -109,8 +108,8 @@ struct Vehicle: Parkable, Hashable {
     }
     
     var parkedTime: Int {
-//        self.carOut()
-        138
+//        self.carOut()    // For production uncomment this line and comment or clear the next line.
+        138     // Value hardcoded for testing purposes.
     }
     
     func carOut()-> Int {
@@ -121,13 +120,12 @@ struct Vehicle: Parkable, Hashable {
     
     func calculateFee() -> Int {
         var fee: Double
+        
         if parkedTime <= 120 {
             return self.type.costo * self.parkedTime
         } else {
             let timeLeft = (parkedTime - 120)/15
-            print("timeLeft = \(timeLeft)")
             let timeLeft2 = (parkedTime - 120)%15
-            print("timeLeft2 = \(timeLeft2)")
             fee = timeLeft2 != 0 ? Double(self.type.costo + ((timeLeft + 1) * 5)) : Double(self.type.costo + (timeLeft * 5))
             print(fee)
         }
@@ -139,10 +137,7 @@ struct Vehicle: Parkable, Hashable {
         return Int(fee)
     }
     
-    
-    
     static func checkOutVehicle(_ plate: String, onSuccess: (Int) -> Void, onError: () -> Void) {
-        
         
     }
         
@@ -158,13 +153,13 @@ struct Vehicle: Parkable, Hashable {
 // MARK: Methods for checkOutVehicle like arguments
 func onSuccess(_ valor: Int) {
     print("Your fee is \(valor). Come back soon")
-    
 }
 
 func onError() -> Void {
     print("Sorry, the check-out failed")
 }
 
+// MARK: Instances of Parking and Vehicules
 var alkeParking = Parking()
 
 let vehicle19 = Vehicle(plate: "ZZQQ34P", type: VehicleType.moto, checkInTime: Date(), discountCard: nil)
@@ -240,7 +235,6 @@ let vehicle21 = Vehicle(plate: "ZZZ78ZZ", type:
 VehicleType.miniBus, checkInTime: Date(), discountCard:
 nil)
 
-
 let arrVehicles: [Vehicle] = [
     vehicle1,
     vehicle2,
@@ -265,20 +259,12 @@ let arrVehicles: [Vehicle] = [
     vehicle21
 ]
 
-var count = 0
 for vehicle in arrVehicles {
-    count += 1
-    print(count)
     alkeParking.checkInVehicle(vehicle, onFinish: alkeParking.onFinished(_:)) // TO DO
-    alkeParking.vehicles.insert(vehicle)
+//    alkeParking.vehicles.insert(vehicle)
 }
 
 print(alkeParking.vehicles.count)
-
-//func sale(_ valor: Int) {
-//    print("Si se pudo, gracias por venir, paga")
-//}
-
 
 // MARK: Exercise 10 - CheckOut.
 let carroSalir = alkeParking.getVehicle("DD444GG")
@@ -288,11 +274,12 @@ if let carro = carroSalir {
     
     Vehicle.checkOutVehicle(carro.plate, onSuccess: onSuccess(_:), onError: { onError() })
     onSuccess(fee)
+    alkeParking.removeVehicle(carro)
     alkeParking.acumulateEarnings(fee)
     alkeParking.showResults()
     alkeParking.listVehicles()
 }
-
+print(alkeParking.vehicles.count)
 
 
 //https://meet.google.com/mzw-jwhq-fwo
