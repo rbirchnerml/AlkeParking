@@ -36,6 +36,7 @@ enum VehicleType {
 struct Parking {
     var vehicles: Set<Vehicle> = []
     let maxVehicles: Int = 20
+    var earnings: (earnings: Int, vehicles: Int) = (0, 0)
     
     func onFinished(_ accepted: Bool) {
         if accepted {
@@ -59,6 +60,18 @@ struct Parking {
             print("todo bien")
             onFinish(true)
         }
+    }
+    
+    mutating func acumulateEarnings(_ valor: Int) -> Void {
+//        let temp1 = earnings.earnings
+        earnings.earnings += valor
+//        let temp2 = earnings.vehicles
+        earnings.vehicles += 1
+        print("acumulate \(earnings)")
+    }
+    
+    func showResults() {
+        print("\(earnings.1) vehicles have checked out and have earnings of $\(earnings.0)")
     }
     
     func validatePlate(_ plate: String) -> Bool  {
@@ -141,6 +154,7 @@ struct Vehicle: Parkable, Hashable {
 // MARK: Methods for checkOutVehicle like arguments
 func onSuccess(_ valor: Int) {
     print("Your fee is \(valor). Come back soon")
+    
 }
 
 func onError() -> Void {
@@ -286,7 +300,8 @@ if let carro = carroSalir {
     
     Vehicle.checkOutVehicle(carro.plate, onSuccess: onSuccess(_:), onError: { onError() })
     onSuccess(fee)
-    
+    alkeParking.acumulateEarnings(fee)
+    alkeParking.showResults()
 }
 
 
