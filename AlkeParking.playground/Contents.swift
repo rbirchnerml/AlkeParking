@@ -5,6 +5,7 @@ protocol Parkable {
     var plate: String { get }
     var type: VehicleType { get }
     
+    func checkOutVehicle(_ plate: String, onSuccess: (Int) -> Void, onError: () -> Void)
     
 }
 
@@ -43,7 +44,7 @@ struct Parking {
             print("Sorry, the check-in failed.")
         }
     }
-    
+//    MARK: Ejercicio 6
     mutating func checkInVehicle(_ vehicle: Vehicle, onFinish: (Bool) -> Void) {
         guard vehicles.count < maxVehicles else {
             onFinish(false)
@@ -51,13 +52,26 @@ struct Parking {
             return
         }
         
-        if  vehicles.map ({ $0.plate}).contains(vehicle.plate) {
+        if  validatePlate(vehicle.plate) {
             print("plate existe")
             onFinish(false)
         } else {
             print("todo bien")
             onFinish(true)
         }
+    }
+    
+    func validatePlate(_ plate: String) -> Bool  {
+        self.vehicles.map ({ $0.plate}).contains(plate)
+    }
+    
+    mutating func getVehicle(_ plate: String) -> Vehicle? {
+        if validatePlate(plate) {
+            let vehicleToLeave = vehicles.first(where: { $0.plate == plate } )
+            if let vehicle = vehicleToLeave  { return vehicle }
+            
+        }
+        return nil
     }
     
 }
@@ -69,9 +83,7 @@ struct Vehicle: Parkable, Hashable {
     let checkInTime: Date
 //    var checkOutTime: Date = Date()
     lazy var discountCard: String? = ""
-    
-       
-    
+        
     init(plate: String, type: VehicleType, checkInTime: Date, discountCard: String? ) {
         self.plate = plate
         self.type = type
@@ -89,6 +101,10 @@ struct Vehicle: Parkable, Hashable {
         return mins
     }
     
+    func checkOutVehicle(_ plate: String, onSuccess: (Int) -> Void, onError: () -> Void) {
+        
+    }
+        
     func hash(into hasher: inout Hasher) {
         hasher.combine(plate)
     }
@@ -111,10 +127,12 @@ struct Vehicle: Parkable, Hashable {
 
 //alkeParking.vehicles.insert(moto1)
 //
-//alkeParking.vehicles.remove(moto)
+//alkeParking.vehicles.remove()
+
 
 
 var alkeParking = Parking()
+
 
 
 let vehicle19 = Vehicle(plate: "ZZQQ34P", type: VehicleType.moto, checkInTime: Date(), discountCard: nil)
@@ -224,6 +242,24 @@ for vehicle in arrVehicles {
 }
 
 print(alkeParking.vehicles.count)
+
+func sale(_ valor: Int) {
+    print("Si se pudo, gracias por venir, paga")
+}
+
+let aPagar: Int = 200
+
+let carroSalir = alkeParking.getVehicle("DD444GG")
+if let carro = carroSalir {
+    carro.checkOutVehicle(carro.plate, onSuccess: sale(_:) ) {
+        print("No se pudo, esta muy caro")
+    }
+    sale(aPagar)
+}
+
+
+
+print(carroSalir)
 
 
 //https://meet.google.com/mzw-jwhq-fwo
