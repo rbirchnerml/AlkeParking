@@ -5,7 +5,7 @@ protocol Parkable {
     var plate: String { get }
     var type: VehicleType { get }
     
-    func checkOutVehicle(_ plate: String, onSuccess: (Int) -> Void, onError: () -> Void)
+    static func checkOutVehicle(_ plate: String, onSuccess: (Int) -> Void, onError: () -> Void)
     
 }
 
@@ -82,7 +82,7 @@ struct Vehicle: Parkable, Hashable {
     let type: VehicleType
     let checkInTime: Date
 //    var checkOutTime: Date = Date()
-    lazy var discountCard: String? = ""
+    var discountCard: String? = ""
         
     init(plate: String, type: VehicleType, checkInTime: Date, discountCard: String? ) {
         self.plate = plate
@@ -102,7 +102,7 @@ struct Vehicle: Parkable, Hashable {
         return mins
     }
     
-    mutating func calculateFee() -> Int {
+    func calculateFee() -> Int {
         var fee: Double
         if parkedTime <= 120 {
             return self.type.costo * self.parkedTime
@@ -115,14 +115,17 @@ struct Vehicle: Parkable, Hashable {
             print(fee)
         }
         
-        if let _ = self.discountCard {
+        if let _ = discountCard {
             fee = fee * 0.85
         }
         
         return Int(fee)
     }
     
-    func checkOutVehicle(_ plate: String, onSuccess: (Int) -> Void, onError: () -> Void) {
+    
+    
+    static func checkOutVehicle(_ plate: String, onSuccess: (Int) -> Void, onError: () -> Void) {
+        
         
     }
         
@@ -135,8 +138,14 @@ struct Vehicle: Parkable, Hashable {
     }
 }
 
+// MARK: Methods for checkOutVehicle like arguments
+func onSuccess(_ valor: Int) {
+    print("Your fee is \(valor). Come back soon")
+}
 
-
+func onError() -> Void {
+    print("Sorry, the check-out failed")
+}
 
 //var alkeParking = Parking()
 
@@ -268,17 +277,17 @@ func sale(_ valor: Int) {
     print("Si se pudo, gracias por venir, paga")
 }
 
-let aPagar: Int = 200
 
+// MARK: Exercise 10 - CheckOut.
 let carroSalir = alkeParking.getVehicle("DD444GG")
-if var carro = carroSalir {
-    carro.checkOutVehicle(carro.plate, onSuccess: sale(_:) ) {
-        print("No se pudo, esta muy caro")
-    }
-    sale(aPagar)
-    print(carro.calculateFee())
-}
 
+if let carro = carroSalir {
+    let fee: Int = carro.calculateFee()
+    
+    Vehicle.checkOutVehicle(carro.plate, onSuccess: onSuccess(_:), onError: { onError() })
+    onSuccess(fee)
+    
+}
 
 
 //print(carroSalir)
