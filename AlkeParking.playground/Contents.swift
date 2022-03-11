@@ -63,7 +63,6 @@ struct Parking {
     mutating func acumulateEarnings(_ valor: Int) -> Void {
         earnings.earnings += valor
         earnings.vehicles += 1
-        print("acumulate \(earnings)")
     }
     
     func listVehicles() {
@@ -127,7 +126,6 @@ struct Vehicle: Parkable, Hashable {
             let timeLeft = (parkedTime - 120)/15
             let timeLeft2 = (parkedTime - 120)%15
             fee = timeLeft2 != 0 ? Double(self.type.costo + ((timeLeft + 1) * 5)) : Double(self.type.costo + (timeLeft * 5))
-            print(fee)
         }
         
         if let _ = discountCard {
@@ -152,7 +150,7 @@ struct Vehicle: Parkable, Hashable {
 
 // MARK: Methods for checkOutVehicle like arguments
 func onSuccess(_ valor: Int) {
-    print("Your fee is \(valor). Come back soon")
+    print("Your fee is \(valor). Come back soon!")
 }
 
 func onError() -> Void {
@@ -260,25 +258,30 @@ let arrVehicles: [Vehicle] = [
 ]
 
 for vehicle in arrVehicles {
-    alkeParking.checkInVehicle(vehicle, onFinish: alkeParking.onFinished(_:)) // TO DO
-//    alkeParking.vehicles.insert(vehicle)
+    alkeParking.checkInVehicle(vehicle, onFinish: alkeParking.onFinished(_:))
 }
 
+// Show how many vehicles are in the parking lote.
 print(alkeParking.vehicles.count)
 
 // MARK: Exercise 10 - CheckOut.
-let carroSalir = alkeParking.getVehicle("DD444GG")
+let vehicleOut = alkeParking.getVehicle("DD444GG")
 
-if let carro = carroSalir {
-    let fee: Int = carro.calculateFee()
-    
-    Vehicle.checkOutVehicle(carro.plate, onSuccess: onSuccess(_:), onError: { onError() })
+if let bus1 = vehicleOut {
+    let fee: Int = bus1.calculateFee()
+    Vehicle.checkOutVehicle(bus1.plate, onSuccess: onSuccess(_:), onError: { onError() })
     onSuccess(fee)
-    alkeParking.removeVehicle(carro)
+    alkeParking.removeVehicle(bus1)
     alkeParking.acumulateEarnings(fee)
-    alkeParking.showResults()
-    alkeParking.listVehicles()
 }
+
+// MARK: Exercise 11 - Show earnings
+alkeParking.showResults()
+
+// MARK: Exercise 12 - List Vehicles.
+alkeParking.listVehicles()
+
+// Show how many vehicles left in the parking lote
 print(alkeParking.vehicles.count)
 
 
