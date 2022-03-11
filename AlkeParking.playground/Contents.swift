@@ -70,6 +70,10 @@ struct Parking {
         print("acumulate \(earnings)")
     }
     
+    func listVehicles() {
+        vehicles.map({print($0.plate)})
+    }
+    
     func showResults() {
         print("\(earnings.1) vehicles have checked out and have earnings of $\(earnings.0)")
     }
@@ -161,23 +165,7 @@ func onError() -> Void {
     print("Sorry, the check-out failed")
 }
 
-//var alkeParking = Parking()
-
-//alkeParking.vehicles.insert(car)
-//alkeParking.vehicles.insert(moto)
-//alkeParking.vehicles.insert(miniBus)
-//alkeParking.vehicles.insert(bus)
-//
-
-//alkeParking.vehicles.insert(moto1)
-//
-//alkeParking.vehicles.remove()
-
-
-
 var alkeParking = Parking()
-
-
 
 let vehicle19 = Vehicle(plate: "ZZQQ34P", type: VehicleType.moto, checkInTime: Date(), discountCard: nil)
 
@@ -287,9 +275,9 @@ for vehicle in arrVehicles {
 
 print(alkeParking.vehicles.count)
 
-func sale(_ valor: Int) {
-    print("Si se pudo, gracias por venir, paga")
-}
+//func sale(_ valor: Int) {
+//    print("Si se pudo, gracias por venir, paga")
+//}
 
 
 // MARK: Exercise 10 - CheckOut.
@@ -302,10 +290,9 @@ if let carro = carroSalir {
     onSuccess(fee)
     alkeParking.acumulateEarnings(fee)
     alkeParking.showResults()
+    alkeParking.listVehicles()
 }
 
-
-//print(carroSalir)
 
 
 //https://meet.google.com/mzw-jwhq-fwo
