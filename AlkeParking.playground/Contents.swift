@@ -92,13 +92,34 @@ struct Vehicle: Parkable, Hashable {
     }
     
     var parkedTime: Int {
-        self.carOut()
+//        self.carOut()
+        138
     }
     
     func carOut()-> Int {
         let mins = Calendar.current.dateComponents([.minute], from:
         checkInTime, to: Date()).minute ?? 0
         return mins
+    }
+    
+    mutating func calculateFee() -> Int {
+        var fee: Double
+        if parkedTime <= 120 {
+            return self.type.costo * self.parkedTime
+        } else {
+            let timeLeft = (parkedTime - 120)/15
+            print("timeLeft = \(timeLeft)")
+            let timeLeft2 = (parkedTime - 120)%15
+            print("timeLeft2 = \(timeLeft2)")
+            fee = timeLeft2 != 0 ? Double(self.type.costo + ((timeLeft + 1) * 5)) : Double(self.type.costo + (timeLeft * 5))
+            print(fee)
+        }
+        
+        if let _ = self.discountCard {
+            fee = fee * 0.85
+        }
+        
+        return Int(fee)
     }
     
     func checkOutVehicle(_ plate: String, onSuccess: (Int) -> Void, onError: () -> Void) {
@@ -250,16 +271,17 @@ func sale(_ valor: Int) {
 let aPagar: Int = 200
 
 let carroSalir = alkeParking.getVehicle("DD444GG")
-if let carro = carroSalir {
+if var carro = carroSalir {
     carro.checkOutVehicle(carro.plate, onSuccess: sale(_:) ) {
         print("No se pudo, esta muy caro")
     }
     sale(aPagar)
+    print(carro.calculateFee())
 }
 
 
 
-print(carroSalir)
+//print(carroSalir)
 
 
 //https://meet.google.com/mzw-jwhq-fwo
